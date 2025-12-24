@@ -29,6 +29,7 @@ function Show() {
   }
   const decode = jwtDecode(token);
   const isAdmin = decode.role === "admin";
+  const isdemo=decode.role==="demo";
   const isSelf = decode.sub === id;
 
   const canEdit = isAdmin || isSelf;
@@ -105,6 +106,7 @@ function Show() {
               {canEdit && (
                 <Button
                   variant="contained"
+                  disabled={isdemo}
                   onClick={() => setEditmode(true)}
                 >
                   Edit
@@ -114,6 +116,7 @@ function Show() {
               {canDelete && (
                 <Button
                   variant="contained"
+                  disabled={isdemo}
                   color="error"
                   onClick={handleDelete}
                 >
@@ -156,12 +159,13 @@ function Show() {
               label="Address"
             />
 
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" disabled={isdemo}>
               Update
             </Button>
-             <Button onClick={handleCancel} variant="contained">
+             <Button onClick={handleCancel} variant="contained" disabled={isdemo}>
               Cancel
             </Button>
+            
           </Stack>
         )}
       </CardContent>

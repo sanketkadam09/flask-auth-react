@@ -34,12 +34,15 @@ def CreateUser():
     data=request.json
 
     email=data.get("email")
+    user=User.query.filter_by(email=email).first()
+    if user:
+        return jsonify({"message":"user already existed"})
 
     if not email:
         return jsonify({"message":"Email not mentioned"})
     
-    if User.query.filter_by(email=email).first():
-        return jsonify({"message":"user already existed"})
+    # if User.query.filter_by(email=email).first():
+    #     return jsonify({"message":"user already existed"})
 
     hashedpassword=generate_password_hash(data.get("password"))
     print("hashed Password"+hashedpassword)
@@ -57,6 +60,31 @@ def CreateUser():
     db.session.add(user)
     db.session.commit()
     return jsonify({"message":"user created successfully"})
+
+# @auth_bp.route("/login/demo",methods=["post"])
+# def DemoLogin():
+#     data=request.json
+#     email=data.get("email")
+#     password=data.get("password")
+#     if not email:
+#         return jsonify({"message":"Please enter correct demo email"})
+    
+#     user= User.query.filter_by(email=email).first()
+
+
+#     if not user or check_password_hash(user.password,password):
+#         return jsonify({"Error":"Invalid Crendentials for Demo login"})
+    
+#     token=create_access_token(
+#         identity=user.id,
+#         additional_claims={"role":user.role,"name":user.name}
+#     )
+#     return jsonify({"message":"user logged in successfully","token":token})
+
+
+
+    
+
 
 
 @auth_bp.route("/login",methods=["POST"])

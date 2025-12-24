@@ -22,6 +22,8 @@ function Login({ setIsLoggedin }) {
     }
   };
 
+ 
+
   return (
     <Box
     sx={{
@@ -51,6 +53,8 @@ function Login({ setIsLoggedin }) {
         />
         <br></br><br></br>
         <Button type="submit" variant="contained" color="primary" sx={{width:"100%"}}>Login</Button>
+        <br></br>
+        
       </form>
     </Box>
   );

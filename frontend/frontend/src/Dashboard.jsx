@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import API from "./api";
 import Register from "./Register";
 import Login from "./Login";
+import FileUpload from "./FileUpload";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
+
 import {
   Box,
   Button,
@@ -122,7 +124,23 @@ function Dashboard() {
           }}
           
         />
+
+
+
        </Box>
+      <Box sx={{ maxWidth: "650px", mx: "auto", mt: 4 }}>
+  <Card elevation={3}>
+    <CardContent>
+      <Typography variant="h5" align="center" gutterBottom>
+        Upload Document
+      </Typography>
+
+      <FileUpload />
+    </CardContent>
+  </Card>
+</Box>
+
+       
 
        {loading ?(
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>

@@ -5,6 +5,8 @@ import Show from "./Show";
 import Register from "./Register";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
+import FileUpload from "./FileUpload";
+
 
 
 
@@ -17,6 +19,8 @@ function App(){
         <Route path="/login" element={<Login setIsLoggedin={setIsLoggedin} />} />
       <Route path="/dashboard" element={<Dashboard/>}/>
       <Route path="/users/:id" element={<Show/>}/>
+      <Route path="/upload" element={<FileUpload/>}/>
+
     </Routes>
   )
 }

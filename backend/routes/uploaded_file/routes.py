@@ -19,7 +19,7 @@ upload_bp=Blueprint("uploaded_file",__name__)
 @upload_bp.route("/upload",methods=["POST"])
 @jwt_required()
 def uploaded_file():
-    user_id=get_jwt_identity();
+    user_id=get_jwt_identity()
 
     file= request.files["file"]
      
@@ -73,7 +73,6 @@ def list_files():
 
 @upload_bp.route("/files/<filename>",methods=["DELETE"])
 @jwt_required()
-
 def delete_file(filename):
     user_id=get_jwt_identity()
 
@@ -85,7 +84,10 @@ def delete_file(filename):
     if not file:
         return jsonify({"error":"File not existed"})
     
-    os.path.join(current_app.config["PUBLIC_FOLDER"],filename)
+    filepath= os.path.join(current_app.config["PUBLIC_FOLDER"],filename)
+    if os.path.exists(filepath):
+        os.remove(filepath)
+
     db.session.delete(file)
     db.session.commit()
     return jsonify({"message":"deleted"})

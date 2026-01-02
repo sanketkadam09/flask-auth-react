@@ -15,12 +15,12 @@ def getUsers():
     if not user:
         return jsonify({"Error":"User not Existed please logged in"})
     
-    page=int(request.args.get("page",1))
-    limit=int(request.args.get("limit",5))
+    # page=int(request.args.get("page",1))
+    # limit=int(request.args.get("limit",5))
     search=request.args.get("search","")
 
 
-    offset=(page-1)*limit
+    # offset=(page-1)*limit
     query=User.query
     if search:
         query=query.filter(
@@ -29,21 +29,31 @@ def getUsers():
             User.address.ilike(f"%{search}%")
          )
 
-    users=query.offset(offset).limit(limit).all()
-    total_users=query.count()
+    # users=query.offset(offset).limit(limit).all()
+    users=query.all();
+    # total_users=query.count()
 
+    # return jsonify({
+    #     "page":page,
+    #     "limit":limit,
+    #     "total_users":total_users,
+    #     "total_pages":(total_users+limit-1)//limit,
+    #     "users": [{
+    #       "id":u.id,
+    #       "name":u.name,
+    #       "email":u.email,
+    #       "address":u.address,
+    #       "role":u.role
+    # }for u in users]})
     return jsonify({
-        "page":page,
-        "limit":limit,
-        "total_users":total_users,
-        "total_pages":(total_users+limit-1)//limit,
-        "users": [{
+             "users": [{
           "id":u.id,
           "name":u.name,
           "email":u.email,
           "address":u.address,
           "role":u.role
-    }for u in users]})
+    }for u in users]
+    })
  
 
 @users_bp.route("/users/<int:id>",methods=["GET"])

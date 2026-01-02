@@ -12,7 +12,7 @@ auth_bp=Blueprint("auth",__name__)
 @auth_bp.route("/register/admin",methods=["POST"])
 def Admin():
     if User.query.filter_by(role="admin").first():
-        return jsonify({"ERROR":"Admin already existed"})
+        return jsonify({"ERROR":"Admin already existed"});
     
     data=request.json
 

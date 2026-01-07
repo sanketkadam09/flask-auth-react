@@ -1,6 +1,6 @@
 import os
 from flask import send_from_directory
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity,get_jwt
 from models import UploadedFile
 from extensions import db
 
@@ -19,8 +19,7 @@ upload_bp=Blueprint("uploaded_file",__name__)
 @upload_bp.route("/upload",methods=["POST"])
 @jwt_required()
 def uploaded_file():
-    user_id=get_jwt_identity()
-
+    user_id=get_jwt_identity() 
     file= request.files["file"]
      
     if not file:
@@ -52,7 +51,6 @@ def uploaded_file():
 
 
 @upload_bp.route("/upload/<filename>")
-
 def get_uploaded_file(filename):
     return send_from_directory(current_app.config["PUBLIC_FOLDER"],filename)
 
@@ -64,19 +62,35 @@ def get_uploaded_file(filename):
 @upload_bp.route("/files")
 @jwt_required()
 def list_files():
-    user_id=get_jwt_identity()
-    files=UploadedFile.query.filter_by(user_id=user_id).all()
-    return jsonify([f.filename for f in files])
+    user_id = get_jwt_identity()
+    role = get_jwt()["role"]
+
+    if role == "admin":
+        files = UploadedFile.query.all()
+    else:
+        files = UploadedFile.query.filter_by(user_id=user_id).all()
+
+    return jsonify([
+        {
+            "id": f.id,
+            "filename": f.filename,
+            "user_id": f.user_id
+        } for f in files
+    ])
+
     
     # files=os.listdir(current_app.config["PUBLIC_FOLDER"])
-    return jsonify(files)
+    # return jsonify(files)
 
 @upload_bp.route("/files/<filename>",methods=["DELETE"])
 @jwt_required()
 def delete_file(filename):
     user_id=get_jwt_identity()
-
-    file=UploadedFile.query.filter_by(
+    role = get_jwt()["role"]
+    if role =="admin":
+        file=UploadedFile.query.filter_by(filename=filename).first()
+    else:    
+        file=UploadedFile.query.filter_by(
         filename=filename,
         user_id=user_id
     ).first()
@@ -91,4 +105,4 @@ def delete_file(filename):
     db.session.delete(file)
     db.session.commit()
     return jsonify({"message":"deleted"})
-
+ 

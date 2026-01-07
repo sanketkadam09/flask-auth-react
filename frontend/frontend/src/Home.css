@@ -1,0 +1,87 @@
+/* Container (full page center) */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ebeaf2, #afabb3, #faf3f6);
+  padding: 16px;
+}
+
+/* Card */
+.home-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 24px;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Heading */
+.home-heading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #4f46e5;
+}
+
+/* Subheading */
+.home-subheading {
+  font-size: 1rem;
+  color: #6b7280; /* gray-500 */
+  margin-bottom: 24px;
+}
+
+/* Buttons container */
+.home-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .home-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.home-btn {
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.home-btn-primary {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.home-btn-primary:hover {
+  background-color: #4338ca;
+}
+
+.home-btn-outline {
+  border: 2px solid #4f46e5;
+  color: #4f46e5;
+  background: white;
+}
+
+.home-btn-outline:hover {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.home-btn-demo {
+  background-color: #9333ea;
+  color: white;
+}
+
+.home-btn-demo:hover {
+  background-color: #7e22ce;
+}

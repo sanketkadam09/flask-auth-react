@@ -18,6 +18,8 @@ class UploadedFile(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(255), nullable=False)
+    # file_url = db.Column(db.String(255), nullable=False)
+    # public_id = db.Column(db.String(255), nullable=False)
 
 
     user_id = db.Column(

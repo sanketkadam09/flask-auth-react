@@ -1,0 +1,35 @@
+/* style.css */
+
+/* Page background */
+body {
+  background: linear-gradient(to right, #e3f2fd, #ffffff);
+  font-family: Arial, sans-serif;
+}
+
+/* Card design */
+.card {
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Button animation */
+.btn-primary {
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+  .card {
+    padding: 20px;
+  }
+}

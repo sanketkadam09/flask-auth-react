@@ -45,7 +45,7 @@ def CreateUser():
     #     return jsonify({"message":"user already existed"})
 
     hashedpassword=generate_password_hash(data.get("password"))
-    print("hashed Password"+hashedpassword)
+    # print("hashed Password"+hashedpassword)
 
 
 

@@ -1,0 +1,210 @@
+/* ============================= */
+/* BASE */
+/* ============================= */
+
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: white;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.upload-card {
+  max-width: 100%;
+  margin: 1rem auto;
+  padding: 0 12px;
+}
+
+/* ============================= */
+/* AG GRID (CRITICAL FIX) */
+/* ============================= */
+
+.grid-wrapper {
+  width: 100%;
+  overflow-x: auto;   /* ONLY GRID SCROLLS */
+}
+
+.grid-container {
+  min-width: 900px;   /* forces scroll on mobile */
+}
+
+.dashboard,
+.main-container,
+.page-wrapper {
+  overflow: visible;
+}
+
+
+.ag-theme-alpine {
+  width: 100%;
+  height: 420px;
+}
+/* ========================= */
+/* STICKY HEADER */
+/* ========================= */
+
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #ffffff;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.welcome-text {
+  margin-bottom: 10px;
+}
+
+.logout-btn {
+  width: 100%;
+  max-width: 200px;
+}
+
+/* ========================= */
+/* STICKY SEARCH BAR */
+/* ========================= */
+
+.search-sticky {
+  position: sticky;
+  top: 130px; /* below header */
+  z-index: 900;
+  background: #f9fafb;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.search-section {
+  max-width: 500px;
+  margin: auto;
+  padding: 0 16px;
+}
+
+/* ========================= */
+/* UPLOAD SECTION */
+/* ========================= */
+
+.upload-section {
+  max-width: 700px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.upload-section .MuiCard-root {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.upload-section button,
+.upload-section input {
+  width: 100%;
+}
+
+/* ========================= */
+/* AG GRID FIX */
+/* ========================= */
+
+.grid-wrapper {
+  margin-top: 20px;
+  padding: 0 16px;
+  overflow-x: auto;
+}
+
+.grid-container {
+  min-width: 900px;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+  .welcome-text {
+    font-size: 1.4rem !important;
+  }
+
+  .search-sticky {
+    
+    top: 78px;
+    background-color: #e0e0e0;
+  }
+
+  .upload-section {
+    margin: 16px auto;
+  }
+
+  .grid-container {
+    min-width: 700px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .dashboard-header {
+    padding: 12px;
+  }
+
+  .search-sticky {
+    top: 72px;
+  }
+
+  .grid-container {
+    min-width: 600px;
+  }
+}
+
+
+/* fileUpload section */
+/* ========================= */
+/* FILE UPLOAD SECTION */
+/* ========================= */
+
+.file-upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* File input + upload button */
+.file-upload-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Upload button */
+.upload-btn {
+  min-width: 120px;
+  height: 56px;
+}
+
+/* View documents button */
+.view-files-btn {
+  align-self: center;
+  width: 100%;
+  max-width: 250px;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+  .file-upload-row {
+    flex-direction: column;
+  }
+
+  .upload-btn {
+    width: 100%;
+  }
+
+  .view-files-btn {
+    width: 100%;
+  }
+}

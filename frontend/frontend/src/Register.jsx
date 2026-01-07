@@ -1,7 +1,6 @@
 import { useState } from "react";
 import API from "./api";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, Stack } from "@mui/material";
 
 function Register() {
   const [name, setName] = useState("");
@@ -16,8 +15,9 @@ function Register() {
       await API.post("/register", { name, email, password, address });
       const res = await API.post("/login", { email, password });
       localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
       alert("User registered successfully");
+      navigate("/dashboard");
+
       setName("");
       setEmail("");
       setPassword("");
@@ -28,79 +28,65 @@ function Register() {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        mt: 5,
-      }}
-    >
-      <Box
-        component="form"
-        onSubmit={handleRegister}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 2,
-          width: "100%",
-          maxWidth: 450,
-        }}
-      >
-        <Typography variant="h4" align="center" gutterBottom>
-          Register User
-        </Typography>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-12 col-sm-10 col-md-6 col-lg-5">
+          <div className="card shadow p-4">
+            <h3 className="text-center mb-4">Register User</h3>
 
-        <TextField
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          fullWidth
-          required={true}
-        />
+            <form onSubmit={handleRegister}>
+              <div className="mb-3">
+                <label className="form-label">Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
 
-        <TextField
-          label="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          fullWidth
-          required={true}
-        />
+              <div className="mb-3">
+                <label className="form-label">Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
 
-        <TextField
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          required={true}
-        />
+              <div className="mb-3">
+                <label className="form-label">Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
 
-        <TextField
-          label="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          fullWidth
-          required={true}
-        />
+              <div className="mb-3">
+                <label className="form-label">Address</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                />
+              </div>
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ mt: 2 }}
-        >
-          Register
-        </Button>
-
-        
-      </Box>
-     
-      
-    </Box>
-     
+              <button type="submit" className="btn btn-primary w-100">
+                Register
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

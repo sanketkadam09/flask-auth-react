@@ -30,7 +30,7 @@ def getUsers():
          )
 
     # users=query.offset(offset).limit(limit).all()
-    users=query.all();
+    users=query.all()
     # total_users=query.count()
 
     # return jsonify({
@@ -83,7 +83,7 @@ def updateUser(id):
     if not user:
         return jsonify({"message":"user not existed"})
     
-    if get_jwt()["role"]!="admin" and user_id!=id :
+    if get_jwt()["role"]!="admin" and user_id!=user.id :
         return jsonify({"error":"unauthorized token"})
     
 

@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState,useRef } from "react";
 import API from "./api";
 import FileList from "./FileList";
-import { Button, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 
 const FileUpload = () => {
 
   const [file, setFile] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
+  // const [fileUrl, setFileUrl] = useState("");
   const [showFiles, setShowFiles] = useState(false);
   const [refreshkey,setRefreshkey]=useState(0);
+
+  const fileInputRef=useRef(null);
 
   const handleChange = (e) => {
     setFile(e.target.files[0]);
@@ -25,10 +27,12 @@ const FileUpload = () => {
 
     try {
       const res = await API.post("/upload", formData);
-      setFileUrl(res.data.file_url);
-       setFile("");
+      // setFileUrl(res.data.file_url);
+     console.log(res)
       setRefreshkey((prev)=>prev+1)
       alert("Document uploaded successfully");
+       fileInputRef.current.value="";
+       setFile("");
      
     } catch (err) {
       console.log(err);
@@ -36,33 +40,38 @@ const FileUpload = () => {
     }
   };
 
-  return (
-    <>
-      <TextField type="file" sx={{fontSize:"20px"}} onChange={handleChange} />
-      <Button variant="contained" sx={{ml:4,fontSize:"15px"}} onClick={handleUpload}>
-        Upload
-      </Button>
-
-      {/* {fileUrl && (
-        <p>
-          Uploaded File:{" "}
-          <a href={fileUrl} target="_blank" rel="noreferrer">
-            View
-          </a>
-        </p>
-      )} */}
+ return (
+  <Box className="file-upload-wrapper">
+    
+    <Box className="file-upload-row">
+      <TextField
+        type="file"
+        inputRef={fileInputRef}
+        onChange={handleChange}
+        fullWidth
+      />
 
       <Button
         variant="contained"
-        sx={{ mt: 3,ml:15 ,fontSize:"15px"}}
-        onClick={() => setShowFiles(!showFiles)}
+        className="upload-btn"
+        onClick={handleUpload}
       >
-        {showFiles ? "Hide Documents" : "View All Documents"}
+        Upload
       </Button>
+    </Box>
 
-      {showFiles && <FileList key={refreshkey} />}
-    </>
-  );
+    <Button
+      variant="outlined"
+      className="view-files-btn"
+      onClick={() => setShowFiles(!showFiles)}
+    >
+      {showFiles ? "Hide Documents" : "View All Documents"}
+    </Button>
+
+    {showFiles && <FileList key={refreshkey} />}
+  </Box>
+);
+
 };
 
 export default FileUpload;

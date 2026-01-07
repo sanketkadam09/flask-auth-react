@@ -1,7 +1,6 @@
 import { useState } from "react";
 import API from "./api";
 import { useNavigate } from "react-router-dom";
-import {Box,TextField,Typography,Button} from "@mui/material"
 
 function Login({ setIsLoggedin }) {
   const [email, setEmail] = useState("");
@@ -16,47 +15,50 @@ function Login({ setIsLoggedin }) {
       setIsLoggedin(true);
       alert("User logged in successfully");
       navigate("/dashboard");
-    } catch(err){
+    } catch (err) {
       console.log(err);
-      alert("User not logged in");
+      alert("Invalid email or password");
     }
   };
 
- 
-
   return (
-    <Box
-    sx={{
-    width:500,
-    mx:"auto",
-    mt:10,
-    display:"flex",
-    flexDirection:"column"
-    }}
-    >
-      <Typography variant="h2" align="center">Login</Typography>
-      <br></br>
-      <form onSubmit={handleLogin}>
-        <TextField 
-        label="Enter your email" 
-        value={email} 
-        fullWidth
-        onChange={(e) => setEmail(e.target.value)}
-         />
-         <br></br><br></br>
-        <TextField
-          label=" password"
-          type="password"
-          value={password}
-          fullWidth
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br></br><br></br>
-        <Button type="submit" variant="contained" color="primary" sx={{width:"100%"}}>Login</Button>
-        <br></br>
-        
-      </form>
-    </Box>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-12 col-sm-10 col-md-6 col-lg-5">
+          <div className="card shadow p-4">
+            <h3 className="text-center mb-4">Login</h3>
+
+            <form onSubmit={handleLogin}>
+              <div className="mb-3">
+                <label className="form-label">Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="btn btn-primary w-100">
+                Login
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

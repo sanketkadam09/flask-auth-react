@@ -19,7 +19,7 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 PUBLIC_FOLDER=os.path.join(app.root_path,"public","document")
 
 app.config["PUBLIC_FOLDER"]=PUBLIC_FOLDER
-app.config["MAX_CONTENT_LENGTH"]=5*1024*1024
+app.config["MAX_CONTENT_LENGTH"]=10*1024*1024
 
 db.init_app(app)
 jwt.init_app(app)

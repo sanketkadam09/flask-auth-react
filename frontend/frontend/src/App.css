@@ -40,3 +40,9 @@
 .read-the-docs {
   color: #888;
 }
+
+mark {
+  background-color: #ffeb3b;
+  padding: 2px 4px;
+  border-radius: 4px;
+}

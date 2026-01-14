@@ -64,6 +64,7 @@
 
 .home-btn-primary:hover {
   background-color: #4338ca;
+  transform: scale(1.1);
 }
 
 .home-btn-outline {
@@ -75,6 +76,7 @@
 .home-btn-outline:hover {
   background-color: #4f46e5;
   color: white;
+  transform: scale(1.1);
 }
 
 .home-btn-demo {
@@ -84,4 +86,5 @@
 
 .home-btn-demo:hover {
   background-color: #7e22ce;
+  transform: scale(1.05);
 }

@@ -9,6 +9,7 @@ import { CircularProgress,  } from "@mui/material";
 import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import "./styles/dashboard.css";
+import OCRSearch from "./OCRSearch";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -23,6 +24,7 @@ import {
   TextField
   
 } from "@mui/material";
+import { blue, lightBlue } from "@mui/material/colors";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -280,13 +282,12 @@ const handleBulkdelete=async()=>{
             <Typography variant="" align="center" gutterBottom>
               Upload Document
             </Typography>
+             <OCRSearch/>
             <FileUpload />
+           
           </CardContent>
         </Card>
       </Box>
-
-
-       
 
        {loading ?(
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
@@ -294,7 +295,7 @@ const handleBulkdelete=async()=>{
   </Box>
        ):(
        <>
-       <Typography variant="h3" align="center"className="mt-4">User List</Typography>
+       <Typography variant="h3" align="center"sx={{marginTop:4,color:lightBlue[400]}}>User List</Typography>
           <hr></hr>
        
 
@@ -321,7 +322,7 @@ const handleBulkdelete=async()=>{
       onGridReady={(params) => setgridApi(params.api)}
       onCellValueChanged={handleUpdate}
       rowSelection="multiple"
-      theme="legacy"
+      theme="alpine"
       pagination={true}
       paginationPageSize={5}
       paginationPageSizeSelector={[5, 10, 15, 20, 25]}
@@ -330,9 +331,7 @@ const handleBulkdelete=async()=>{
     
   </Box>
 </Box>
-
-
-          </>
+  </>
        )}
 
           {Array.isArray(users)&& users.length===0 && !loading &&(

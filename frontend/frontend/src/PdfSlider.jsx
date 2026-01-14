@@ -38,7 +38,7 @@ const PdfSlider=({pdfs,onDelete})=>{
 
     return(
         <Box sx={{ textAlign: "center", mt: 2 }}>
-             <iframe src={`http://127.0.0.1:5000/upload/${pdfs[currentPdf]}`} width="500" height={550} style={{ borderRadius: "10px" }} />
+             <iframe src={`http://127.0.0.1:5000/upload/${pdfs[currentPdf]}`} width="300" height={350} style={{ borderRadius: "10px" }} />
 
 
          <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>

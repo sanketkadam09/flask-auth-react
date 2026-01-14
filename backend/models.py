@@ -1,4 +1,5 @@
 from extensions import db
+from sqlalchemy.dialects.postgresql import JSON
 
 class User(db.Model):
     __tablename__="users"
@@ -20,6 +21,8 @@ class UploadedFile(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     # file_url = db.Column(db.String(255), nullable=False)
     # public_id = db.Column(db.String(255), nullable=False)
+    ocr_text=db.Column(JSON,nullable=True)
+    extracted_info = db.Column(db.JSON, nullable=True)
 
 
     user_id = db.Column(

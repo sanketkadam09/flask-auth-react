@@ -1,6 +1,6 @@
 import { useState } from "react";
 import API from "./api";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 
 function Login({ setIsLoggedin }) {
   const [email, setEmail] = useState("");
@@ -14,7 +14,11 @@ function Login({ setIsLoggedin }) {
       localStorage.setItem("token", res.data.token);
       setIsLoggedin(true);
       alert("User logged in successfully");
-      navigate("/dashboard");
+      const token=localStorage.getItem("token");
+      if(token){
+              navigate("/dashboard",{replace:true});
+      }
+      
     } catch (err) {
       console.log(err);
       alert("Invalid email or password");

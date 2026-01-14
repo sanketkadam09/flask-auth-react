@@ -1,6 +1,4 @@
-/* ============================= */
-/* BASE */
-/* ============================= */
+
 
 .dashboard-header {
   position: sticky;
@@ -71,17 +69,26 @@
 
 .search-sticky {
   position: sticky;
-  top: 130px; /* below header */
-  z-index: 900;
-  background: #f9fafb;
+  margin-top: 7;
+  width: 700px;
+  margin: auto;
+  top: 140px; /* below header */
+  z-index: 980;
+  background: #eef5fb;
   padding: 12px 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #f2eded;
 }
 
 .search-section {
   max-width: 500px;
   margin: auto;
   padding: 0 16px;
+}
+
+mark {
+  background-color: #ffeb3b;
+  padding: 2px 4px;
+  border-radius: 4px;
 }
 
 /* ========================= */
@@ -129,9 +136,13 @@
   }
 
   .search-sticky {
-    
+    position: sticky;
     top: 78px;
-    background-color: #e0e0e0;
+    width: 80%;
+    margin: 0 auto; 
+    background-color: #fefefe;
+    z-index: 900;
+     border-radius: 8px;
   }
 
   .upload-section {
@@ -150,7 +161,7 @@
   }
 
   .search-sticky {
-    top: 72px;
+    top: 95px;
   }
 
   .grid-container {
@@ -201,7 +212,7 @@
   }
 
   .upload-btn {
-    width: 100%;
+    width: 50%;
   }
 
   .view-files-btn {

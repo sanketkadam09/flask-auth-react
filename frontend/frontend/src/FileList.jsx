@@ -58,7 +58,7 @@ const FileList=()=>{
               setpdfFiles((prev)=>
                       prev.filter((pdf)=>pdf!==filename)
               )
-              alert("PDf deleted successfully")
+              // alert("PDf deleted successfully")
           }catch(err){
             console.log(err);
           }

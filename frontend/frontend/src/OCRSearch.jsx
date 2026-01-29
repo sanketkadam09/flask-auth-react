@@ -7,6 +7,7 @@ import {
   Typography,
   TextField,
   Button,
+  Grid,
 } from "@mui/material";
 
 function OCRSearch() {
@@ -38,13 +39,13 @@ function OCRSearch() {
   const highlightText = (text, keyword) => {
     if (!keyword || !text) return text;
     const regex = new RegExp(`(${keyword})`, "gi");
-    return text.replace(regex, "<mark>$1</mark>");
+    return text.replace(regex, "<mark style='background-color: #ffd54f'>$1</mark>");
   };
 
   return (
     <Box className="ocr-search-section px-3 mt-4">
       {/* Search Card */}
-      <Card elevation={3}>
+      <Card elevation={3} sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Search Uploaded Documents
@@ -61,94 +62,48 @@ function OCRSearch() {
 
       {/* Results */}
       {results.length > 0 && (
-        <Box className="ocr-results mt-3 px-3">
-          <Typography variant="h6">Search Results</Typography>
-          <Box>
-            {results.map((res, index) => (
-              <Card key={index} sx={{ mb: 2 }}>
+        <Grid container spacing={2}>
+          {results.map((res, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card elevation={2}>
                 <CardContent>
-                  {/* Header row with View button */}
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Typography variant="subtitle1">
-                      <strong>File:</strong> {res.filename} |{" "}
-                      <strong>Page:</strong> {res.page}
-                    </Typography>
+                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                    File: {res.filename} | Page: {res.page_number}
+                  </Typography>
 
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        minWidth: "auto",
-                        ml:6,
-                        padding: "5px 2px",
-                        fontSize: "10px",
-                        lineHeight: 1,
+                  {res.matched_text && (
+                    <Typography
+                      variant="body2"
+                      sx={{ mt: 1 }}
+                      dangerouslySetInnerHTML={{
+                        __html: highlightText(res.matched_text, query),
                       }}
-                      onClick={() => {
-                        const pdfUrl = `http://localhost:5000/upload/${res.filename}#page=${res.page}`;
-                        window.open(pdfUrl, "_blank");
-                      }}
-                    >
-                      View
-                    </Button>
-                  </Box>
-
-                  {/* Extracted info */}
-                  {res.extracted_info && (
-                    <Box mt={1}>
-                      {res.extracted_info.name && (
-                        <Typography
-                          dangerouslySetInnerHTML={{
-                            __html: `<strong>Name:</strong> ${highlightText(
-                              res.extracted_info.name,
-                              query
-                            )}`,
-                          }}
-                        />
-                      )}
-                      {res.extracted_info.email && (
-                        <Typography
-                          dangerouslySetInnerHTML={{
-                            __html: `<strong>Email:</strong> ${highlightText(
-                              res.extracted_info.email,
-                              query
-                            )}`,
-                          }}
-                        />
-                      )}
-                      {res.extracted_info.phone && (
-                        <Typography
-                          dangerouslySetInnerHTML={{
-                            __html: `<strong>Phone:</strong> ${highlightText(
-                              res.extracted_info.phone,
-                              query
-                            )}`,
-                          }}
-                        />
-                      )}
-                      {res.extracted_info.skills &&
-                        res.extracted_info.skills.length > 0 && (
-                          <Typography
-                            dangerouslySetInnerHTML={{
-                              __html: `<strong>Skills:</strong> ${res.extracted_info.skills
-                                .map((skill) =>
-                                  highlightText(skill, query)
-                                )
-                                .join(", ")}`,
-                            }}
-                          />
-                        )}
-                    </Box>
+                    />
                   )}
+
+                  {/* {res.meta_info && (
+                    <Typography variant="caption" display="block" color="textSecondary" mt={1}>
+                      {JSON.stringify(res.meta_info)}
+                    </Typography>
+                  )} */}
+
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ mt: 2 }}
+                    fullWidth
+                    onClick={() => {
+                      const pdfUrl = `http://localhost:5000/upload/${res.filename}#page=${res.page_number}`;
+                      window.open(pdfUrl, "_blank");
+                    }}
+                  >
+                    View File
+                  </Button>
                 </CardContent>
               </Card>
-            ))}
-          </Box>
-        </Box>
+            </Grid>
+          ))}
+        </Grid>
       )}
 
       {/* No results message */}

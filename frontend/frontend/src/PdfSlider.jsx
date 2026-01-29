@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Button, Box } from "@mui/material";
 // import API from "./api"
-import { Worker, Viewer } from '@react-pdf-viewer/core';
+// import { Worker, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 
 
 const PdfSlider=({pdfs,onDelete})=>{
        
     const [currentPdf,setCurrentPdf]=useState(0);
+
+
+    useEffect(() => {
+    if (pdfs && pdfs.length > 0) {
+        setCurrentPdf(pdfs.length - 1);
+    }
+       }, [pdfs]);
+
 
     if (!pdfs || pdfs.length === 0) {
     return <p>No pdfs available</p>;

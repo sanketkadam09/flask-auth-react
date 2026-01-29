@@ -17,7 +17,7 @@ const ImageSlider = ({ images,onDelete}) => {
 
   const prevImage = () => {
     setCurrent((prev) =>
-      prev === 0 ? images.length - 1 : prev + 1
+      prev === 0 ? images.length - 1 : prev - 1
     );
   };
 

@@ -1,0 +1,22 @@
+.textLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.textLayer span {
+  color: transparent;
+  white-space: pre;
+}
+
+/* Highlighted text becomes visible */
+.textLayer span[style*="background"] {
+  color: #000 !important;
+}
+
+.textLayer .highlight {
+  background-color: rgba(206, 216, 12, 0.6) !important;
+  /* color: #000 !important; */
+}
+

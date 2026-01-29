@@ -9,7 +9,8 @@ import { CircularProgress,  } from "@mui/material";
 import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import "./styles/dashboard.css";
-import OCRSearch from "./OCRSearch";
+// import OCRSearch from "./OCRSearch";
+import SearchResultViewer from "./SearchResultViewer";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -276,13 +277,13 @@ const handleBulkdelete=async()=>{
 </Box>
 </Box> 
 
-     <Box className="upload-section px-3">
+     <Box className="upload-section px3">
         <Card elevation={3}>
           <CardContent>
             <Typography variant="" align="center" gutterBottom>
               Upload Document
             </Typography>
-             <OCRSearch/>
+             <SearchResultViewer/>
             <FileUpload />
            
           </CardContent>
@@ -310,7 +311,7 @@ const handleBulkdelete=async()=>{
 
   <Box
     className="ag-theme-alpine grid-container"
-    // style={{ height: "450px", width: "100%" }}
+  
   >
     <AgGridReact
       rowData={users}

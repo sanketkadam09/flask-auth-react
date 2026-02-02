@@ -19,6 +19,8 @@ class User(db.Model):
     phone_no=db.Column(db.String(15),unique=True,nullable=True)
     
     files = db.relationship("UploadedFile", backref="user", lazy=True)
+
+
 class UploadedFile(db.Model):
     __tablename__ = "uploaded_files"
 
@@ -41,6 +43,11 @@ class UploadedFile(db.Model):
         backref="uploaded_file",
         cascade="all, delete-orphan"
     )
+    ocr_words=db.relationship(
+        "OcrWord",
+        backref="uploaded_file",
+        cascade="all,delete-orphan"
+    )
 
 
 
@@ -61,3 +68,29 @@ class FileChunk(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     # uploaded_file = db.relationship("UploadedFile", backref="chunks")
+
+
+
+class OcrWord(db.Model):
+    __tablename__ = "ocr_words"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    file_id = db.Column(
+        db.Integer,
+        db.ForeignKey("uploaded_files.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    page_number = db.Column(db.Integer, nullable=False)
+    text = db.Column(db.String, nullable=False)
+
+    x = db.Column(db.Integer, nullable=False)
+    y = db.Column(db.Integer, nullable=False)
+    w = db.Column(db.Integer, nullable=False)
+    h = db.Column(db.Integer, nullable=False)
+
+    confidence = db.Column(db.Float, nullable=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    # uploaded_file = db.relationship("UploadedFile", backref="ocr_words")

@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, request, jsonify,send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from werkzeug.utils import secure_filename
-from models import UploadedFile, FileChunk
+from models import UploadedFile, FileChunk,OcrWord
 from extensions import db
 from PIL import Image
 import pytesseract
@@ -16,7 +16,7 @@ from google import genai
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-client = genai.Client(api_key="AIzaSyB78ul6UCrodE5tgQ6zoh-5-8BBUhrouyc")
+client = genai.Client(api_key="AIzaSyAQ5wxWfIkRPDTdz8bKZVgl4n_R0NIWeL0")
 upload_bp = Blueprint("uploaded_file", __name__)
 
 
@@ -48,7 +48,6 @@ def get_embedding(text):
     return np.array(result.embeddings[0].values)
 
 # - UPLOAD ROUTE
-
 @upload_bp.route("/upload", methods=["POST"])
 @jwt_required()
 def uploaded_file():
@@ -66,23 +65,56 @@ def uploaded_file():
 
     # ------------------ OCR Extraction ------------------
     ocr_text = {}
+    ocr_words = []
+
     if filename.lower().endswith(".pdf"):
         pages = convert_from_path(file_path, poppler_path=r"C:\poppler-25.12.0\Library\bin")
         for i, page in enumerate(pages, start=1):
             img = page.convert("L").resize((page.width * 2, page.height * 2))
             img = img.point(lambda x: 0 if x < 140 else 255, '1')
+
+            # full page text
             text = pytesseract.image_to_string(img, lang='eng+mar', config="--psm 6")
             ocr_text[i] = text
+
+            # word-level bounding boxes
+            data = pytesseract.image_to_data(img, lang='eng+mar', config="--psm 6", output_type=pytesseract.Output.DICT)
+            for idx in range(len(data['text'])):
+                if data['text'][idx].strip() == "":
+                    continue
+                ocr_words.append({
+                    "page": i,
+                    "text": data['text'][idx],
+                    "x": data['left'][idx],
+                    "y": data['top'][idx],
+                    "w": data['width'][idx],
+                    "h": data['height'][idx],
+                    "conf": data['conf'][idx]
+                })
     else:
         img = Image.open(file_path).convert("L")
         w, h = img.size
         img = img.resize((w * 3, h * 2))
-
         img = img.point(lambda x: 0 if x < 140 else 255, '1')
+
         text = pytesseract.image_to_string(img, lang='eng+mar', config="--psm 6")
         ocr_text[1] = text
 
-    #  Extract basic info 
+        data = pytesseract.image_to_data(img, lang='eng+mar', config="--psm 6", output_type=pytesseract.Output.DICT)
+        for idx in range(len(data['text'])):
+            if data['text'][idx].strip() == "":
+                continue
+            ocr_words.append({
+                "page": 1,
+                "text": data['text'][idx],
+                "x": data['left'][idx],
+                "y": data['top'][idx],
+                "w": data['width'][idx],
+                "h": data['height'][idx],
+                "conf": data['conf'][idx]
+            })
+
+    # ------------------ Extract basic info ------------------
     extracted_info = {}
     for page, text in ocr_text.items():
         extracted_info[page] = extract_basic_info(text)
@@ -95,9 +127,24 @@ def uploaded_file():
         extracted_info=extracted_info
     )
     db.session.add(new_file)
-    db.session.commit()  
+    db.session.commit()  # new_file.id is now available
 
-    # ------------------ Chunking + Embedding ------------------
+    # ------------------ Save OCR words ------------------
+    for word in ocr_words:
+        new_word = OcrWord(
+            file_id=new_file.id,  # MUST HAVE
+            page_number=word["page"],
+            text=word["text"],
+            x=word["x"],
+            y=word["y"],
+            w=word["w"],
+            h=word["h"],
+            confidence=word["conf"]
+        )
+        db.session.add(new_word)
+    db.session.commit()
+
+    # ------------------ Chunking + Embedding (existing logic) ------------------
     for page, text in ocr_text.items():
         chunks = chunk_text(text, chunk_size=40)
         for chunk_text_item in chunks:
@@ -117,9 +164,8 @@ def uploaded_file():
         "user_id": user_id,
         "ocr_text": ocr_text,
         "extracted_info": extracted_info,
-        "message": "File uploaded and embeddings stored successfully!"
+        "message": "File uploaded, OCR words saved, and embeddings stored successfully!"
     })
-
 
 # ------------------ FILE ACCESS ------------------
 
@@ -215,3 +261,19 @@ def search_files():
         })
 
     return jsonify(results)
+
+
+@upload_bp.route("/ocr_words")
+@jwt_required()
+def get_ocr_words():
+    file_id = request.args.get("file_id")
+    page = int(request.args.get("page_number", 1))
+
+    words = OcrWord.query.filter_by(file_id=file_id, page_number=page).all()
+    return jsonify([{
+        "text": w.text,
+        "x": w.x,
+        "y": w.y,
+        "w": w.w,
+        "h": w.h
+    } for w in words])

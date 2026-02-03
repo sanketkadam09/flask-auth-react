@@ -16,7 +16,7 @@ from google import genai
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-client = genai.Client(api_key="AIzaSyAQ5wxWfIkRPDTdz8bKZVgl4n_R0NIWeL0")
+client = genai.Client(api_key="AIzaSyAksgghhM4dGy0Dd-XJUEIGSnPv-9l90_U")
 upload_bp = Blueprint("uploaded_file", __name__)
 
 
@@ -51,123 +51,157 @@ def get_embedding(text):
 @upload_bp.route("/upload", methods=["POST"])
 @jwt_required()
 def uploaded_file():
+    import uuid
     user_id = get_jwt_identity()
     file = request.files.get("file")
 
-    if not file or file.filename == '':
+    if not file or file.filename == "":
         return jsonify({"error": "No file selected"}), 400
     if not allowed_file(file.filename):
         return jsonify({"error": "Invalid file type"}), 400
 
+    # ---------------- Save file ----------------
     filename = secure_filename(file.filename)
-    file_path = os.path.join(current_app.config["PUBLIC_FOLDER"], filename)
+    unique_name = f"{uuid.uuid4()}_{filename}"
+    file_path = os.path.join(current_app.config["PUBLIC_FOLDER"], unique_name)
     file.save(file_path)
 
-    # ------------------ OCR Extraction ------------------
     ocr_text = {}
     ocr_words = []
 
-    if filename.lower().endswith(".pdf"):
-        pages = convert_from_path(file_path, poppler_path=r"C:\poppler-25.12.0\Library\bin")
-        for i, page in enumerate(pages, start=1):
-            img = page.convert("L").resize((page.width * 2, page.height * 2))
-            img = img.point(lambda x: 0 if x < 140 else 255, '1')
 
-            # full page text
-            text = pytesseract.image_to_string(img, lang='eng+mar', config="--psm 6")
-            ocr_text[i] = text
+    def process_image(img, page_no):
+    
+     orig_w, orig_h = img.size
+     print(f"Processing image - Original size: {orig_w}x{orig_h}")  # Debug log
 
-            # word-level bounding boxes
-            data = pytesseract.image_to_data(img, lang='eng+mar', config="--psm 6", output_type=pytesseract.Output.DICT)
-            for idx in range(len(data['text'])):
-                if data['text'][idx].strip() == "":
-                    continue
-                ocr_words.append({
-                    "page": i,
-                    "text": data['text'][idx],
-                    "x": data['left'][idx],
-                    "y": data['top'][idx],
-                    "w": data['width'][idx],
-                    "h": data['height'][idx],
-                    "conf": data['conf'][idx]
-                })
+    
+     img_gray = img.convert("L")
+     img_bin = img_gray.point(lambda x: 0 if x < 140 else 255, "1")
+
+    
+     text = pytesseract.image_to_string(img_bin, lang="eng+mar", config="--psm 6")
+     ocr_text[page_no] = text
+
+   
+     data = pytesseract.image_to_data(
+         img_gray,  
+          lang="eng+mar", 
+         config="--psm 6", 
+         output_type=pytesseract.Output.DICT
+    )
+
+     print(f"Found {len(data['text'])} text elements")  # Debug log
+
+     for i in range(len(data["text"])):
+         word_text = data["text"][i].strip()
+         if not word_text:
+            continue
+        
+        
+         if len(ocr_words) == 0:
+            print(f"First word: '{word_text}' at ({data['left'][i]}, {data['top'][i]}) "
+                  f"size: {data['width'][i]}x{data['height'][i]}, orig: {orig_w}x{orig_h}")
+        
+         ocr_words.append({
+            "page": page_no,
+            "text": word_text,
+            "x": int(data["left"][i]),
+            "y": int(data["top"][i]),
+            "w": int(data["width"][i]),
+            "h": int(data["height"][i]),
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "conf": float(data["conf"][i]),
+            "orig_width": orig_w,
+            "orig_height": orig_h
+        })
+
+    # ---------------- Handle PDFs ----------------
+    if unique_name.lower().endswith(".pdf"):
+        from pdf2image import convert_from_path
+        from PyPDF2 import PdfReader
+
+        reader = PdfReader(file_path)
+        for i, page in enumerate(reader.pages, start=1):
+            page_text = page.extract_text() or ""
+            if page_text.strip():
+                # Text-based PDF → store in FileChunks for embeddings
+                ocr_text[i] = page_text
+            else:
+                # Scanned PDF → process via OCR AND save image
+                pages_images = convert_from_path(
+                    file_path, first_page=i, last_page=i,
+                    poppler_path=r"C:\poppler-25.12.0\Library\bin"
+                )
+                page_image = pages_images[0]
+                
+                # **FIXED: Save the page as an image file**
+                page_image_filename = f"{unique_name}_page_{i}.jpg"
+                page_image_path = os.path.join(current_app.config["PUBLIC_FOLDER"], page_image_filename)
+                page_image.save(page_image_path, "JPEG")
+                
+              
+                process_image(page_image, i)
     else:
-        img = Image.open(file_path).convert("L")
-        w, h = img.size
-        img = img.resize((w * 3, h * 2))
-        img = img.point(lambda x: 0 if x < 140 else 255, '1')
+        # Handle regular images
+        from PIL import Image
+        img = Image.open(file_path)
+        process_image(img, 1)
 
-        text = pytesseract.image_to_string(img, lang='eng+mar', config="--psm 6")
-        ocr_text[1] = text
+    
+    extracted_info = {page: extract_basic_info(text) for page, text in ocr_text.items()}
 
-        data = pytesseract.image_to_data(img, lang='eng+mar', config="--psm 6", output_type=pytesseract.Output.DICT)
-        for idx in range(len(data['text'])):
-            if data['text'][idx].strip() == "":
-                continue
-            ocr_words.append({
-                "page": 1,
-                "text": data['text'][idx],
-                "x": data['left'][idx],
-                "y": data['top'][idx],
-                "w": data['width'][idx],
-                "h": data['height'][idx],
-                "conf": data['conf'][idx]
-            })
-
-    # ------------------ Extract basic info ------------------
-    extracted_info = {}
-    for page, text in ocr_text.items():
-        extracted_info[page] = extract_basic_info(text)
-
-    # ------------------ Save UploadedFile first ------------------
     new_file = UploadedFile(
-        filename=filename,
+        filename=unique_name,
         user_id=user_id,
         ocr_text=ocr_text,
         extracted_info=extracted_info
     )
     db.session.add(new_file)
-    db.session.commit()  # new_file.id is now available
+    db.session.commit()
 
-    # ------------------ Save OCR words ------------------
+    # Save OCR Words
     for word in ocr_words:
-        new_word = OcrWord(
-            file_id=new_file.id,  # MUST HAVE
+        db.session.add(OcrWord(
+            file_id=new_file.id,
             page_number=word["page"],
             text=word["text"],
             x=word["x"],
             y=word["y"],
             w=word["w"],
             h=word["h"],
-            confidence=word["conf"]
-        )
-        db.session.add(new_word)
+            scale_x=word["scale_x"],
+            scale_y=word["scale_y"],
+            confidence=word["conf"],
+            orig_width=word["orig_width"],
+            orig_height=word["orig_height"]
+        ))
     db.session.commit()
 
-    # ------------------ Chunking + Embedding (existing logic) ------------------
+    # Chunking + Embeddings 
     for page, text in ocr_text.items():
-        chunks = chunk_text(text, chunk_size=40)
-        for chunk_text_item in chunks:
-            vec = get_embedding(chunk_text_item)
-            new_chunk = FileChunk(
+        for chunk in chunk_text(text, chunk_size=40):
+            db.session.add(FileChunk(
                 file_id=new_file.id,
                 page_number=page,
-                chunk_text=chunk_text_item,
-                embedding=vec,
+                chunk_text=chunk,
+                embedding=get_embedding(chunk),
                 meta_info=extracted_info.get(page, {})
-            )
-            db.session.add(new_chunk)
+            ))
     db.session.commit()
 
     return jsonify({
-        "filename": filename,
-        "user_id": user_id,
+        "file_id": new_file.id,
+        "filename": unique_name,
         "ocr_text": ocr_text,
         "extracted_info": extracted_info,
-        "message": "File uploaded, OCR words saved, and embeddings stored successfully!"
-    })
+        "message": "File uploaded, OCR words saved, text and embeddings stored successfully!"
+    }), 201
 
-# ------------------ FILE ACCESS ------------------
+
+
+
 
 @upload_bp.route("/upload/<filename>")
 def get_uploaded_file(filename):
@@ -221,7 +255,6 @@ def delete_file(filename):
     db.session.commit()
 
     return jsonify({"message": "deleted"})
-
 # search
 @upload_bp.route("/search")
 @jwt_required()
@@ -239,12 +272,11 @@ def search_files():
     if role != "admin":
         chunks_query = chunks_query.join(UploadedFile).filter(UploadedFile.user_id == user_id)
 
-    #  Order by cosine similarity in DB
+    # Order by cosine similarity in DB
     top_chunks = (
         chunks_query
         .order_by(FileChunk.embedding.op("<=>")(query_vec))
-
-        .limit(5)  # return top 5 results
+        .limit(5)
         .all()
     )
 
@@ -253,15 +285,30 @@ def search_files():
     
     results = []
     for chunk in top_chunks:
+        uploaded_file = chunk.uploaded_file
+        filename = uploaded_file.filename
+        
+       
+        is_image = filename.lower().endswith(('.png', '.jpg', '.jpeg'))
+        
+       
+        if filename.lower().endswith('.pdf'):
+            page_text = uploaded_file.ocr_text.get(str(chunk.page_number), "")
+            is_scanned = page_text.strip() == ""
+        else:
+            
+            is_scanned = True
+
         results.append({
-            "filename": chunk.uploaded_file.filename,
+            "filename": filename,
             "page_number": chunk.page_number,
             "matched_text": chunk.chunk_text,
             "meta_info": chunk.meta_info,
+            "is_scanned": is_scanned,
+            "file_id": uploaded_file.id
         })
 
     return jsonify(results)
-
 
 @upload_bp.route("/ocr_words")
 @jwt_required()
@@ -275,5 +322,10 @@ def get_ocr_words():
         "x": w.x,
         "y": w.y,
         "w": w.w,
-        "h": w.h
+        "h": w.h,
+        "scale_x":w.scale_x,
+        "scale_y":w.scale_y,
+        "orig_width": w.orig_width,    
+        "orig_height": w.orig_height,
+        "confidence":w.confidence
     } for w in words])

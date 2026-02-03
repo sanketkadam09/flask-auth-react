@@ -70,7 +70,6 @@ class FileChunk(db.Model):
     # uploaded_file = db.relationship("UploadedFile", backref="chunks")
 
 
-
 class OcrWord(db.Model):
     __tablename__ = "ocr_words"
 
@@ -83,12 +82,19 @@ class OcrWord(db.Model):
     )
 
     page_number = db.Column(db.Integer, nullable=False)
-    text = db.Column(db.String, nullable=False)
+    text = db.Column(db.String(100), nullable=False)
 
+    
     x = db.Column(db.Integer, nullable=False)
     y = db.Column(db.Integer, nullable=False)
     w = db.Column(db.Integer, nullable=False)
     h = db.Column(db.Integer, nullable=False)
+
+    scale_x = db.Column(db.Float, nullable=False)
+    scale_y = db.Column(db.Float, nullable=False)
+
+    orig_width = db.Column(db.Integer, nullable=False)   
+    orig_height = db.Column(db.Integer, nullable=False)
 
     confidence = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
